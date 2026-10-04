@@ -18,12 +18,15 @@ stemmer = PorterStemmer()
 
 os.makedirs('models', exist_ok=True)
 
-if not os.path.exists('dataset/spam.csv'):
-    raise FileNotFoundError("dataset not found. Please download the dataset and place it in the 'dataset' folder.")
+# if not os.path.exists('dataset/spam.csv'):
+#     raise FileNotFoundError("dataset not found. Please download the dataset and place it in the 'dataset' folder.")
 
-df = pd.read_csv('dataset/spam.csv', encoding='latin-1')
+if not os.path.exists('dataset/train.csv'):
+     raise FileNotFoundError("dataset not found. Please download the dataset and place it in the 'dataset' folder.")
 
-df = df[['v1', 'v2']]
+df = pd.read_csv('dataset/train.csv', encoding='latin-1')
+
+# df = df[['v1', 'v2']]
 df.columns = ['label', 'message']
 df = df.drop_duplicates() 
 df['label'] = df['label'].map({'ham': 0, 'spam': 1})  # ham=0, spam=1
