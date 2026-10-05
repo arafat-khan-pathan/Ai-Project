@@ -531,16 +531,6 @@
                             <div id="test-ham-count" class="metric-value">-</div>
                             <div class="metric-subtext">Ham messages in test data</div>
                         </div>
-                        <div class="metric-card highlight">
-                            <div class="metric-label">Total Spam</div>
-                            <div id="total-spam-count" class="metric-value">-</div>
-                            <div class="metric-subtext">Spam messages in all data</div>
-                        </div>
-                        <div class="metric-card highlight">
-                            <div class="metric-label">Total Ham</div>
-                            <div id="total-ham-count" class="metric-value">-</div>
-                            <div class="metric-subtext">Ham messages in all data</div>
-                        </div>
                     </div>
                 </div>
 
@@ -689,8 +679,6 @@
                 document.getElementById('train-ham-count').textContent = data.counts.train_ham_count.toLocaleString();
                 document.getElementById('test-spam-count').textContent = data.counts.test_spam_count.toLocaleString();
                 document.getElementById('test-ham-count').textContent = data.counts.test_ham_count.toLocaleString();
-                document.getElementById('total-spam-count').textContent = data.counts.total_spam_count.toLocaleString();
-                document.getElementById('total-ham-count').textContent = data.counts.total_ham_count.toLocaleString();
                 document.getElementById('accuracy').textContent = `${data.metrics.accuracy}%`;
                 document.getElementById('precision').textContent = `${data.metrics.precision}%`;
                 document.getElementById('recall').textContent = `${data.metrics.recall}%`;
