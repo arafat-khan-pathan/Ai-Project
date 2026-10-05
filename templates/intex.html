@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Spam Detection Portal - UIU Theme</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --uiu-orange: #F26522;
+            --uiu-orange-hover: #D84315;
+            --uiu-orange-light: #FFF3EC;
+            --bg-light: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --success-green: #10B981;
+            --success-bg: #ECFDF5;
+            --error-red: #EF4444;
+            --error-bg: #FEE2E2;
+            --error-row-bg: #FDE8E8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 76px;
+        }
+
+        /* Top Header */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 2px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: var(--uiu-orange);
+            color: white;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+        }
+
+        .logo-title h1 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .logo-title p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-light);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn.active {
+            background: var(--uiu-orange);
+            color: white;
+            box-shadow: 0 2px 8px rgba(242, 101, 34, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Home View - Single Predictor */
+        .predictor-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .predictor-header {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .predictor-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .predictor-header p {
+            color: var(--text-muted);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--uiu-orange);
+        }
+
+        .btn-predict {
+            background: var(--uiu-orange);
+            color: white;
+            padding: 14px 28px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            width: 100%;
+        }
+
+        .btn-predict:hover {
+            background: var(--uiu-orange-hover);
+        }
+
+        /* Result Display Box */
+        .result-box {
+            display: none;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-box.spam {
+            background-color: var(--error-bg);
+            border-color: var(--error-red);
+            color: #991B1B;
+        }
+
+        .result-box.ham {
+            background-color: var(--success-bg);
+            border-color: var(--success-green);
+            color: #065F46;
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-confidence {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--uiu-orange);
+            border-radius: 2px;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .metric-card.highlight {
+            background: var(--uiu-orange-light);
+            border-color: rgba(242, 101, 34, 0.3);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .metric-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Detection vs Error Cards */
+        .detection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .det-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            background: var(--border-color);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        /* Table & Filters */
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-light);
+            color: var(--text-muted);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--uiu-orange);
+            color: white;
+            border-color: var(--uiu-orange);
+        }
+
+        .table-wrapper {
+            max-height: 520px;
+            overflow: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-light);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        /* Reddish background for mismatched predictions */
+        tr.mismatch {
+            background-color: var(--error-row-bg) !important;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-spam {
+            background: var(--error-bg);
+            color: var(--error-red);
+        }
+
+        .badge-ham {
+            background: var(--success-bg);
+            color: var(--success-green);
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            background: var(--card-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <span class="logo-badge">UIU</span>
+                <div class="logo-title">
+                    <h1>AI Spam Detector</h1>
+                    <p>Machine Learning Text Classifier</p>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-btn active" onclick="switchTab('home', event)">Home</button>
+                <button class="nav-btn" onclick="switchTab('dashboard', event)">Dashboard</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- HOME TAB: Real-time Spam Predictor -->
+        <div id="home-tab" class="tab-content active">
+            <div class="predictor-card">
+                <div class="predictor-header">
+                    <h2>Test Message Prediction</h2>
+                    <p>Enter any SMS or email text below to analyze if it is Spam or Ham.</p>
+                </div>
+
+                <div class="input-group">
+                    <textarea id="message-input" placeholder="Type or paste your message here (e.g., 'URGENT! You have won a $1,000 cash prize. Call now to claim!')..."></textarea>
+                    <button class="btn-predict" onclick="predictMessage()">Predict Message Output</button>
+                </div>
+
+                <!-- Prediction Output -->
+                <div id="result-box" class="result-box">
+                    <div id="result-icon" class="result-icon"></div>
+                    <div id="result-title" class="result-title"></div>
+                    <div id="result-confidence" class="result-confidence"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD TAB: Dataset Statistics & Model Evaluation -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="dashboard-grid">
+                <div>
+                    <div class="section-title">Dataset & Split Summary</div>
+                    <div class="metrics-row">
+                        <div class="metric-card highlight">
+                            <div class="metric-label">Total Dataset Rows</div>
+                            <div id="dataset-total" class="metric-value">-</div>
+                            <div id="dataset-count-breakdown" class="metric-subtext">Ham: - | Spam: -</div>
+                            <div id="dataset-breakdown" class="metric-subtext">- ham | - spam</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Call / Msg Count</div>
+                            <div id="call-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Train + test messages</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">80% Train Data</div>
+                            <div id="train-count" class="metric-value">-</div>
+                            <div id="train-count-breakdown" class="metric-subtext">Ham: - | Spam: -</div>
+                            <div id="train-breakdown" class="metric-subtext">- ham | - spam</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">20% Test Data</div>
+                            <div id="test-count" class="metric-value">-</div>
+                            <div id="test-count-breakdown" class="metric-subtext">Ham: - | Spam: -</div>
+                            <div id="test-breakdown" class="metric-subtext">- ham | - spam</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Train Spam</div>
+                            <div id="train-spam-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Spam messages in training data</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Train Ham</div>
+                            <div id="train-ham-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Ham messages in training data</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Test Spam</div>
+                            <div id="test-spam-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Spam messages in test data</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Test Ham</div>
+                            <div id="test-ham-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Ham messages in test data</div>
+                        </div>
+                        <div class="metric-card highlight">
+                            <div class="metric-label">Total Spam</div>
+                            <div id="total-spam-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Spam messages in all data</div>
+                        </div>
+                        <div class="metric-card highlight">
+                            <div class="metric-label">Total Ham</div>
+                            <div id="total-ham-count" class="metric-value">-</div>
+                            <div class="metric-subtext">Ham messages in all data</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">Model Evaluation Metrics</div>
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <div class="metric-label">Accuracy</div>
+                            <div id="accuracy" class="metric-value" style="color: var(--uiu-orange)">-</div>
+                            <div class="metric-subtext">Test set accuracy</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Precision</div>
+                            <div id="precision" class="metric-value" style="color: #2563EB">-</div>
+                            <div class="metric-subtext">Spam precision</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Recall</div>
+                            <div id="recall" class="metric-value" style="color: #7C3AED">-</div>
+                            <div class="metric-subtext">Spam sensitivity</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">F1-Score</div>
+                            <div id="f1" class="metric-value" style="color: #059669">-</div>
+                            <div class="metric-subtext">Balanced test score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="section-title">Class-Wise Detection & Error Rates</div>
+                    <div class="detection-grid">
+                        <div class="det-card">
+                            <div style="display:flex; justify-shadow:space-between; justify-content:space-between; font-weight:700;">
+                                <span>Spam Detection Rate</span>
+                                <span id="spam-rate" style="color:var(--uiu-orange)">-</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div id="spam-progress" class="progress-bar-fill" style="width: 0%; background: var(--uiu-orange)"></div>
+                            </div>
+                            <div class="detection-error">
+                                Error Rate (False Negative): <span id="spam-error">-</span>
+                            </div>
+                        </div>
+
+                        <div class="det-card">
+                            <div style="display:flex; justify-content:space-between; font-weight:700;">
+                                <span>Ham Detection Rate</span>
+                                <span id="ham-rate" style="color:var(--success-green)">-</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div id="ham-progress" class="progress-bar-fill" style="width: 0%; background: var(--success-green)"></div>
+                            </div>
+                            <div class="detection-error">
+                                Error Rate (False Positive): <span id="ham-error">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Set Results Table with Filter -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="section-title" style="margin-bottom:0">Test Set Inspection Table</div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterTable('all', event)">All</button>
+                            <button class="filter-btn" onclick="filterTable('spam', event)">Spam</button>
+                            <button class="filter-btn" onclick="filterTable('ham', event)">Ham</button>
+                            <button class="filter-btn" onclick="filterTable('correct', event)">Correct</button>
+                            <button class="filter-btn" onclick="filterTable('wrong', event)">Wrong (Mismatched)</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">Real Message</th>
+                                    <th>Label</th>
+                                    <th>Predicted</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="test-table-body">
+                                <tr><td colspan="4">Loading test data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        AI Spam Detection Project &copy; UIU Theme Interface
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Tab Switcher Logic
+        function switchTab(tabName, clickEvent) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            clickEvent.currentTarget.classList.add('active');
+            
+            if (tabName === 'home') {
+                document.getElementById('home-tab').classList.add('active');
+            } else {
+                document.getElementById('dashboard-tab').classList.add('active');
+                loadDashboard();
+            }
+        }
+
+        // Home Page Predictor Logic
+    async function predictMessage() { const input = document.getElementById('message-input').value.trim(); const resultBox = document.getElementById('result-box'); const resultIcon = document.getElementById('result-icon'); const resultTitle = document.getElementById('result-title'); const resultConfidence = document.getElementById('result-confidence'); if (!input) { alert('Please enter a message to test!'); return; } try { const response = await fetch('/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: input }) }); const data = await response.json(); const isSpam = data.prediction === 'spam'; resultBox.style.display = 'block'; resultBox.className = 'result-box ' + (isSpam ? 'spam' : 'ham'); if (isSpam) { resultIcon.innerHTML = '❌'; resultTitle.innerHTML = 'SPAM DETECTED'; } else { resultIcon.innerHTML = '✅'; resultTitle.innerHTML = 'HAM (LEGITIMATE MESSAGE)'; } resultConfidence.innerHTML = `Confidence Score: <strong>${data.confidence}</strong>`; } catch (error) { alert('Could not connect to the raw Python server!'); } }
+
+        let testData = [];
+        let dashboardLoaded = false;
+
+        async function loadDashboard() {
+            if (dashboardLoaded) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/dashboard');
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Dashboard request failed');
+                }
+
+                document.getElementById('dataset-total').textContent = data.counts.dataset_total.toLocaleString();
+                document.getElementById('call-count').textContent = data.counts.call_count.toLocaleString();
+                document.getElementById('train-count').textContent = data.counts.train_count.toLocaleString();
+                document.getElementById('test-count').textContent = data.counts.test_count.toLocaleString();
+                const percentage = (count, total) => total ? ((count / total) * 100).toFixed(1) : '0.0';
+                document.getElementById('dataset-count-breakdown').textContent = `Ham: ${data.counts.total_ham_count.toLocaleString()} | Spam: ${data.counts.total_spam_count.toLocaleString()}`;
+                document.getElementById('dataset-breakdown').textContent = `${percentage(data.counts.total_ham_count, data.counts.dataset_total)}% ham | ${percentage(data.counts.total_spam_count, data.counts.dataset_total)}% spam`;
+                document.getElementById('train-count-breakdown').textContent = `Ham: ${data.counts.train_ham_count.toLocaleString()} | Spam: ${data.counts.train_spam_count.toLocaleString()}`;
+                document.getElementById('train-breakdown').textContent = `${percentage(data.counts.train_ham_count, data.counts.train_count)}% ham | ${percentage(data.counts.train_spam_count, data.counts.train_count)}% spam`;
+                document.getElementById('test-count-breakdown').textContent = `Ham: ${data.counts.test_ham_count.toLocaleString()} | Spam: ${data.counts.test_spam_count.toLocaleString()}`;
+                document.getElementById('test-breakdown').textContent = `${percentage(data.counts.test_ham_count, data.counts.test_count)}% ham | ${percentage(data.counts.test_spam_count, data.counts.test_count)}% spam`;
+                document.getElementById('train-spam-count').textContent = data.counts.train_spam_count.toLocaleString();
+                document.getElementById('train-ham-count').textContent = data.counts.train_ham_count.toLocaleString();
+                document.getElementById('test-spam-count').textContent = data.counts.test_spam_count.toLocaleString();
+                document.getElementById('test-ham-count').textContent = data.counts.test_ham_count.toLocaleString();
+                document.getElementById('total-spam-count').textContent = data.counts.total_spam_count.toLocaleString();
+                document.getElementById('total-ham-count').textContent = data.counts.total_ham_count.toLocaleString();
+                document.getElementById('accuracy').textContent = `${data.metrics.accuracy}%`;
+                document.getElementById('precision').textContent = `${data.metrics.precision}%`;
+                document.getElementById('recall').textContent = `${data.metrics.recall}%`;
+                document.getElementById('f1').textContent = `${data.metrics.f1}%`;
+                document.getElementById('spam-rate').textContent = `${data.detection.spam_rate}%`;
+                document.getElementById('spam-error').textContent = `${data.detection.spam_error}%`;
+                document.getElementById('spam-progress').style.width = `${data.detection.spam_rate}%`;
+                document.getElementById('ham-rate').textContent = `${data.detection.ham_rate}%`;
+                document.getElementById('ham-error').textContent = `${data.detection.ham_error}%`;
+                document.getElementById('ham-progress').style.width = `${data.detection.ham_rate}%`;
+                testData = data.rows;
+                dashboardLoaded = true;
+                renderTable(testData);
+            } catch (error) {
+                document.getElementById('test-table-body').innerHTML = `<tr><td colspan="4">${error.message}</td></tr>`;
+            }
+        }
+
+        // Render Test Results Table with Mismatch Highlighting
+        function renderTable(data) {
+            const tbody = document.getElementById('test-table-body');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                const isMismatch = item.label !== item.prediction;
+
+                // Reddish background for non-matching row as requested
+                if (isMismatch) {
+                    tr.classList.add('mismatch');
+                }
+
+                tr.innerHTML = `
+                    <td>${item.message}</td>
+                    <td><span class="badge badge-${item.label}">${item.label.toUpperCase()}</span></td>
+                    <td><span class="badge badge-${item.prediction}">${item.prediction.toUpperCase()}</span> ${isMismatch ? '⚠️' : ''}</td>
+                    <td><strong>${item.confidence}</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Table Filtering
+        function filterTable(type, clickEvent) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            clickEvent.currentTarget.classList.add('active');
+
+            let filtered = testData;
+            if (type === 'spam') {
+                filtered = testData.filter(d => d.label === 'spam');
+            } else if (type === 'ham') {
+                filtered = testData.filter(d => d.label === 'ham');
+            } else if (type === 'correct') {
+                filtered = testData.filter(d => d.label === d.prediction);
+            } else if (type === 'wrong') {
+                filtered = testData.filter(d => d.label !== d.prediction);
+            }
+
+            renderTable(filtered);
+        }
+
+        // Initial Table Render
+        renderTable(testData);
+    </script>
+</body>
+</html>
